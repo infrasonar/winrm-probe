@@ -1,5 +1,5 @@
-[![CI](https://github.com/infrasonar/ping-probe/workflows/CI/badge.svg)](https://github.com/infrasonar/ping-probe/actions)
-[![Release Version](https://img.shields.io/github/release/infrasonar/ping-probe)](https://github.com/infrasonar/ping-probe/releases)
+[![CI](https://github.com/infrasonar/winrm-probe/workflows/CI/badge.svg)](https://github.com/infrasonar/winrm-probe/actions)
+[![Release Version](https://img.shields.io/github/release/infrasonar/winrm-probe)](https://github.com/infrasonar/winrm-probe/releases)
 
 # InfraSonar Ping Probe
 
@@ -20,7 +20,7 @@ Variable            | Default                        | Description
 ## Docker build
 
 ```
-docker build -t ping-probe . --no-cache
+docker build -t winrm-probe . --no-cache
 ```
 
 ## Dry run
