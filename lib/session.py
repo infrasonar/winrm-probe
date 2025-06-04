@@ -1,6 +1,6 @@
 from __future__ import annotations
 from base64 import b64encode
-from typing import Optional
+from typing import Optional, Any
 from winrm import Response
 from winrm.protocol import Protocol
 import asyncio
@@ -27,6 +27,15 @@ class Session:
         if self.loop is None:
             self.__class__.loop = asyncio.get_running_loop()
 
+    @staticmethod
+    def _decode(b: bytes) -> str:
+        try:
+            msg = b.decode('utf-8')
+        except Exception:
+            msg = b.decode('cp1252')
+
+        return msg
+
     def _strip_namespace(self, xml: bytes) -> bytes:
         """strips any namespaces from an xml string"""
         p = re.compile(b'xmlns=*[""][^""]*[""]')
@@ -38,7 +47,6 @@ class Session:
     def _clean_error_msg(self, msg: bytes) -> bytes:
         """converts a Powershell CLIXML message to a more human readable
         string"""
-        # TODO prepare unit test, beautify code
         # if the msg does not start with this, return it as is
         if msg.startswith(b"#< CLIXML\r\n"):
             # for proper xml, we need to remove the CLIXML part
@@ -101,20 +109,23 @@ class Session:
             else:
                 break
 
-        return rs
-
-        if len(rs.std_err):
-            # if there was an error message, clean it it up and make it human
+        if rs.status_code:
+            # if there was an error, clean it it up and make it human
             # readable
-            b = self._clean_error_msg(rs.std_err)
             try:
-                msg = b.decode('utf-8')
+                b = self._clean_error_msg(rs.std_err)
+                msg = self._decode(b)
+                assert msg  # only raise when we have a message
+                raise Exception(msg)
             except Exception:
-                msg = b.decode('cp1252')
+                raise Exception(f'status code: {rs.status_code} (no message)')
 
-            raise Exception(msg)
-
-        return json.loads(rs.std_out)
+        try:
+            resp = json.loads(rs.std_out)
+        except Exception:
+            msg = self._decode(rs.std_out)
+            msg = f'{msg[:17]}...' if len(msg) > 20 else msg
+            raise Exception(f'failed to parse json content: {msg}')
 
 
     def _open_shell(self):
@@ -142,10 +153,10 @@ class Session:
             self.protocol = None
             self.shell_id = None
 
-    async def query(self, script: str):
+    async def query(self, script: str) -> Any:
         assert self.loop
         async with self.lock:
-            await self.loop.run_in_executor(None, self._query, script)
+            return await self.loop.run_in_executor(None, self._query, script)
 
     @classmethod
     async def get(cls, username: str, password: str,
