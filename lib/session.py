@@ -101,6 +101,8 @@ class Session:
             else:
                 break
 
+        return rs
+
         if len(rs.std_err):
             # if there was an error message, clean it it up and make it human
             # readable
