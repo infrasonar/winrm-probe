@@ -16,8 +16,7 @@ class Session:
     loop: Optional[asyncio.AbstractEventLoop] = None
 
     def __init__(self, username: str, password: str,
-                 host: str, port: int = 5986,
-                 ssl: Optional[bool] = None):
+                 host: str, port: int = 5986):
         self.lock = asyncio.Lock()
         self.host = host
         self.username = username
@@ -25,7 +24,6 @@ class Session:
         self.port = port
         self.protocol: Optional[Protocol] = None
         self.shell_id: Optional[str] = None
-        self.ssl = ssl
         if self.loop is None:
             self.__class__.loop = asyncio.get_running_loop()
 
@@ -120,9 +118,7 @@ class Session:
     def _open_shell(self):
         assert self.protocol is None and self.shell_id is None
         # WinRM port 5985 is http and 5986 is https
-        proto = 'http' \
-            if self.ssl is False or (self.ssl is None and self.port == 5985) \
-                else 'https'
+        proto = 'http' if self.port == 5985 else 'https'
 
         self.protocol = Protocol(
             endpoint=f'{proto}://{self.host}:{self.port}/wsman',
@@ -151,12 +147,11 @@ class Session:
 
     @classmethod
     async def get(cls, username: str, password: str,
-                  host: str, port: int = 5986,
-                  ssl: Optional[bool] = None) -> Session:
+                  host: str, port: int = 5986) -> Session:
         key = (host, username, password, port)
         sess = cls.sessions.get(key)
         if sess is None:
-            sess = cls.sessions[key] = cls(username, password, host, port, ssl)
+            sess = cls.sessions[key] = cls(username, password, host, port)
 
         return sess
 
