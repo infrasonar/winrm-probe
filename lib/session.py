@@ -15,8 +15,8 @@ class Session:
     sessions: dict[tuple[str, str, str, int], Session] = dict()
     loop: Optional[asyncio.AbstractEventLoop] = None
 
-    def __init__(self, host: str, username: str, password: str,
-                 port: int = 5986):
+    def __init__(self, username: str, password: str,
+                 host: str, port: int = 5986):
         self.lock = asyncio.Lock()
         self.host = host
         self.username = username
@@ -147,12 +147,12 @@ class Session:
 
 
     @classmethod
-    async def get(cls, host: str, username: str, password: str,
+    async def get(cls, username: str, password: str, host: str,
                   port: int = 5986) -> Session:
         key = (host, username, password, port)
         sess = cls.sessions.get(key)
         if sess is None:
-            sess = cls.sessions[key] = cls(host, username, password, port)
+            sess = cls.sessions[key] = cls(username, password, host, port)
 
         return sess
 

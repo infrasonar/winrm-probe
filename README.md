@@ -1,7 +1,7 @@
 [![CI](https://github.com/infrasonar/winrm-probe/workflows/CI/badge.svg)](https://github.com/infrasonar/winrm-probe/actions)
 [![Release Version](https://img.shields.io/github/release/infrasonar/winrm-probe)](https://github.com/infrasonar/winrm-probe/releases)
 
-# InfraSonar Ping Probe
+# InfraSonar WinRM (Remote Powershell) Probe
 
 ## Environment variable
 
@@ -26,7 +26,7 @@ docker build -t winrm-probe . --no-cache
 ## Dry run
 
 Available checks:
-- `ping`
+- `software`
 
 Create a yaml file, for example _(test.yaml)_:
 
@@ -46,4 +46,3 @@ Run the probe with the `DRY_RUN` environment variable set the the yaml file abov
 ```
 DRY_RUN=test.yaml python main.py
 ```
-# winrm-probe
