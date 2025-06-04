@@ -118,7 +118,7 @@ class Session:
     def _open_shell(self):
         assert self.protocol is None and self.shell_id is None
         self.protocol = Protocol(
-            endpoint=f'https://{self.host}:{self.port}/wsman',
+            endpoint=f'http://{self.host}:{self.port}/wsman',
             transport='ntlm',
             username=self.username,
             password=self.password,
