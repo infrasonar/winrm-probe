@@ -1,5 +1,5 @@
 # Get Scheduled Task Information
-$tasks = Get-ScheduledTask | Get-ScheduledTaskInfo | Select-Object -Property LastRunTime, LastTaskResult, NextRunTime, NumberOfMissedRuns, TaskName, PSComputerName
+$tasks = Get-ScheduledTask | Get-ScheduledTaskInfo | Select-Object -Property LastRunTime, NextRunTime, LastTaskResult, NumberOfMissedRuns, TaskName, PSComputerName
 
 # Define the Unix Epoch start time (January 1, 1970, 00:00:00 UTC)
 # Using [DateTimeOffset] for better handling of UTC and milliseconds
@@ -9,7 +9,7 @@ $unixEpochTicksInSeconds = $unixEpoch.Ticks / 10000000
 # Process the tasks and convert dates to Unix timestamps
 # Note we divide by 10.000.000 as there are 10,000,000 nanosecond ticks in one second
 $processedTasks = $tasks | Select-Object -Property @{
-    Name = 'LastRunTimestamp'
+    Name = 'LastRunTime'
     Expression = {
         # Check if LastRunTime exists and is a valid DateTime object
         if ($_.LastRunTime -and ($_.LastRunTime -is [DateTime]) -and ($_.LastRunTime -ne [DateTime]::MinValue)) {
@@ -20,7 +20,7 @@ $processedTasks = $tasks | Select-Object -Property @{
         }
     }
 }, @{
-    Name = 'NextRunTimestamp'
+    Name = 'NextRunTime'
     Expression = {
         # Check if NextRunTime exists and is a valid DateTime object
         if ($_.NextRunTime -and ($_.NextRunTime -is [DateTime]) -and ($_.NextRunTime -ne [DateTime]::MinValue)) {
@@ -30,12 +30,7 @@ $processedTasks = $tasks | Select-Object -Property @{
             $null # Or 0, or an empty string
         }
     }
-}, @{
-    Name = 'Type'
-    Expression = {
-        $_.NextRunTime.GetType().Name
-    }
-}, LastRunTime
+}, LastTaskResult, NumberOfMissedRuns, TaskName, PSComputerName
 
 # Create JSON
 $out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
