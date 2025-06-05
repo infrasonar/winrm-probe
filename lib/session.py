@@ -7,6 +7,7 @@ import asyncio
 import json
 import logging
 import re
+import time
 import warnings
 import xml.etree.ElementTree as ET
 
@@ -14,6 +15,8 @@ import xml.etree.ElementTree as ET
 class Session:
     sessions: dict[tuple[str, str, str, int], Session] = dict()
     loop: Optional[asyncio.AbstractEventLoop] = None
+    task: Optional[asyncio.Future] = None
+    max_idle: float = 60.0
 
     def __init__(self, username: str, password: str,
                  host: str, port: int = 5986):
@@ -22,10 +25,26 @@ class Session:
         self.username = username
         self.password = password
         self.port = port
+        self.last_access = time.time()
+
         self.protocol: Optional[Protocol] = None
         self.shell_id: Optional[str] = None
         if self.loop is None:
             self.__class__.loop = asyncio.get_running_loop()
+            self.__class__.task = asyncio.ensure_future(self.close_sessions())
+
+    @classmethod
+    async def close_sessions(cls):
+        while True:
+            min_threshold = time.time() - cls.max_idle
+            for key, sess in cls.sessions.copy().items():
+                if sess.last_access < min_threshold:
+                    async with sess.lock:
+                        if sess.protocol and sess.shell_id:
+                            sess._close_shell()
+                            del cls.sessions[key]
+            for _ in range(20):
+                await asyncio.sleep(0.5)
 
     @staticmethod
     def _decode(b: bytes) -> str:
@@ -35,6 +54,10 @@ class Session:
             msg = b.decode('cp1252')
 
         return msg
+
+    @staticmethod
+    def _truncate(msg: str, n: int) -> str:
+        return f'{msg[:n-3]}...' if len(msg) > n else msg
 
     def _strip_namespace(self, xml: bytes) -> bytes:
         """strips any namespaces from an xml string"""
@@ -81,7 +104,7 @@ class Session:
         # just return the original message
         return msg
 
-    def _query(self, script: str):
+    def _query(self, script: str) -> Any:
         encoded_ps = b64encode(script.encode("utf_16_le")).decode("ascii")
         command = f"powershell -encodedcommand {encoded_ps}"
         retry = True
@@ -121,12 +144,12 @@ class Session:
                 raise Exception(f'status code: {rs.status_code} (no message)')
 
         try:
-            resp = json.loads(rs.std_out)
+            data = json.loads(rs.std_out)
         except Exception:
-            msg = self._decode(rs.std_out)
-            msg = f'{msg[:17]}...' if len(msg) > 20 else msg
-            raise Exception(f'failed to parse json content: {msg}')
+            msg = self._truncate(self._decode(rs.std_out), 20)
+            raise Exception(f'failed to parse content as JSON: {msg}')
 
+        return data
 
     def _open_shell(self):
         assert self.protocol is None and self.shell_id is None
@@ -156,7 +179,9 @@ class Session:
     async def query(self, script: str) -> Any:
         assert self.loop
         async with self.lock:
-            return await self.loop.run_in_executor(None, self._query, script)
+            res = await self.loop.run_in_executor(None, self._query, script)
+            self.last_access = time.time()  # update on no exception
+            return res
 
     @classmethod
     async def get(cls, username: str, password: str,
