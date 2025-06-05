@@ -20,7 +20,7 @@ $processedTasks = $tasks | Select-Object -Property @{
         # Check if NextRunTime exists and is a valid DateTime object
         if ($_.NextRunTime -and ($_.NextRunTime -is [DateTime]) -and ($_.NextRunTime -ne [DateTime]::MinValue)) {
             # Convert to DateTimeOffset, then calculate Unix seconds
-            [int64]([DateTimeOffset]$_.LastRunTime.ToUniversalTime()).ToUnixTimeSeconds()
+            [int64]([DateTimeOffset]$_.NextRunTime.ToUniversalTime()).ToUnixTimeSeconds()
         } else {
             $null # Or 0, or an empty string
         }
