@@ -23,7 +23,7 @@ async def check_scheduled_tasks(
 
     counter = defaultdict(int)
     for item in items:
-        name = 'piet'
+        name = item['TaskName']
         counter[name] += 1
         item['name'] = f'{name}{counter[name]}'
 
