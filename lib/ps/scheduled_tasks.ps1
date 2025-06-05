@@ -33,7 +33,6 @@ $allTasksData = Get-ScheduledTask | ForEach-Object {
     # Construct the custom object for JSON output
     [PSCustomObject]@{
         TaskName = $task.TaskName
-        TaskPath = $task.TaskPath
         State = $task.State.ToString() # Get State from the base task object and convert enum to string
         LastRunTime = $lastRunTime
         NextRunTime = $nextRunTime
