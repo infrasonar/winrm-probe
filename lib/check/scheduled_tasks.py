@@ -4,6 +4,14 @@ from ..utils import ps_script, get_session
 
 SCHEDULED_TASKS_PS1 = ps_script('scheduled_tasks.ps1')
 
+        "LastRunTime": "/Date(1746375193000)/",
+        "LastTaskResult": 0,
+        "NextRunTime": null,
+        "NumberOfMissedRuns": 0,
+        "TaskName": "OobeDiscovery",
+        "TaskPath": "\\Microsoft\\Windows\\WwanSvc\\",
+        "PSComputerName": null
+
 
 async def check_scheduled_tasks(
         asset: Asset,

@@ -37,7 +37,7 @@ foreach ($path in $registryPaths) {
 }
 
 # Create JSON
-$out = $arr | ConvertTo-Json -Compress
+$out = $arr | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
 
 # Write JSON
 Write-Host $out
