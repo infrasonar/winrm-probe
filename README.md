@@ -23,6 +23,17 @@ Variable            | Default                        | Description
 docker build -t winrm-probe . --no-cache
 ```
 
+## Config
+
+Example configuration: _(the example below is the default when no config is given)_
+
+```yaml
+winrm:
+  config:
+    username: my-domain\my-user
+    password: my-secret-password
+```
+
 ## Dry run
 
 Available checks:
@@ -33,13 +44,13 @@ Create a yaml file, for example _(test.yaml)_:
 ```yaml
 asset:
   name: "foo.local"
-  check: "ping"
+  check: "software"
   config:
     address: "192.168.1.2"
-    interval: 1
-    count: 5
-    timeout: 5
+    port: 5985
 ```
+
+> Port `5985` for http, use `5986` _(default)_ for https.
 
 Run the probe with the `DRY_RUN` environment variable set the the yaml file above.
 

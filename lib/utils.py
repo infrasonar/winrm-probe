@@ -5,10 +5,7 @@ from .session import Session
 
 
 def ps_script(fn: str) -> str:
-    fn = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                      'ps',
-                      fn)
-
+    fn = os.path.join(os.path.dirname(__file__), 'ps', fn)
     with open(fn, 'r') as fp:
         content = fp.read()
 
