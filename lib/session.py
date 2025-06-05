@@ -113,7 +113,7 @@ class Session:
                 self._open_shell()
                 retry = False
 
-            assert(self.protocol and self.shell_id)
+            assert self.protocol and self.shell_id
             try:
                 command_id = self.protocol.run_command(self.shell_id, command)
                 try:
