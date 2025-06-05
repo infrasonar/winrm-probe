@@ -62,6 +62,10 @@ async def check_scheduled_tasks(
             item.pop('LastTaskResult')
         else:
             item['LastTaskResultStr'] = result_to_string(rc)
+            if rc == 267011:
+                # Task Not Yet Run, we might have a last run time, but this
+                # value means nothing
+                item['LastRunTime'] = None
 
         # remove properties which are null often to reduce size
         for key in ('LastRunTime', 'NextRunTime', 'PSComputerName'):
