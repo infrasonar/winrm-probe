@@ -8,6 +8,6 @@ if __name__ == '__main__':
         'software': check_software
     }
 
-    probe = Probe("software", version, checks)
+    probe = Probe("winrm", version, checks)
 
     probe.start()
