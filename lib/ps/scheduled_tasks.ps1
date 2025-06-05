@@ -27,6 +27,9 @@ $processedTasks = $tasks | Select-Object -Property @{
     }
 }, LastTaskResult, NumberOfMissedRuns, TaskName, PSComputerName
 
+$processedTasks = Get-ScheduledTask
+
+
 # Create JSON
 $out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
 
