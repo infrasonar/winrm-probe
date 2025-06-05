@@ -5,6 +5,12 @@
 
 > At least **.NET Framework 4.6 or higher** is required.
 
+## Enable WinRM
+
+```
+winrm quickconfig
+```
+
 ## Environment variable
 
 Variable            | Default                        | Description

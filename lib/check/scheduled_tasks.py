@@ -18,7 +18,7 @@ SCHEDULED_TASKS_PS1 = ps_script('scheduled_tasks.ps1')
 
 def result_to_string(i: int, loopkup: dict[int, str] = {
             0: "Success",
-            1: "Incorrect Function/Unknown Function",
+            1: "Incorrect/Unknown Function",
             2: "File Not Found",
             10: "Environment Incorrect",
             # Common HRESULTs from Task Scheduler
