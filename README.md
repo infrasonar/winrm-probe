@@ -3,6 +3,8 @@
 
 # InfraSonar WinRM (Remote Powershell) Probe
 
+> At least **.NET Framework 4.6 or higher** is required.
+
 ## Environment variable
 
 Variable            | Default                        | Description

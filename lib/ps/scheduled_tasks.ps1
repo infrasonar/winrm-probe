@@ -1,37 +1,49 @@
-# Get Scheduled Task Information
-$tasks = Get-ScheduledTask | Get-ScheduledTaskInfo | Select-Object -Property LastRunTime, NextRunTime, LastTaskResult, NumberOfMissedRuns, TaskName, PSComputerName
+# Define the Unix Epoch start time (January 1, 1970, 00:00:00 UTC)
+$unixEpoch = [DateTimeOffset](Get-Date -Year 1970 -Month 1 -Day 1 -Hour 0 -Minute 0 -Second 0 -Millisecond 0 -Kind Utc)
 
-# Process the tasks and convert dates to Unix timestamps
-# Note we divide by 10.000.000 as there are 10,000,000 nanosecond ticks in one second
-$processedTasks = $tasks | Select-Object -Property @{
-    Name = 'LastRunTimeTs'
-    Expression = {
-        # Check if LastRunTime exists and is a valid DateTime object
-        if ($_.LastRunTime -and ($_.LastRunTime -is [DateTime]) -and ($_.LastRunTime -ne [DateTime]::MinValue)) {
-            # Convert to DateTimeOffset to easily get Unix milliseconds
-            [int64]([DateTimeOffset]$_.LastRunTime.ToUniversalTime()).ToUnixTimeSeconds()
-        } else {
-            $null # Or 0, or an empty string, depending on your desired output for null dates
+# Process all scheduled tasks
+$allTasksData = Get-ScheduledTask | ForEach-Object {
+    $task = $_ # This is the object from Get-ScheduledTask (contains State)
+    $taskInfo = $task | Get-ScheduledTaskInfo -ErrorAction SilentlyContinue # Get details for this specific task
+
+    # Initialize variables for properties that might be missing if $taskInfo is null
+    $lastRunTime = $null
+    $nextRunTime = $null
+    $lastTaskResult = $null
+    $numberOfMissedRuns = $null
+    $psComputerName = $task.PSComputerName # PSComputerName is usually available on the base task object
+
+    # Populate values from $taskInfo if it was successfully retrieved
+    if ($taskInfo) {
+        # Convert LastRunTime
+        if ($taskInfo.LastRunTime -and ($taskInfo.LastRunTime -is [DateTime]) -and ($taskInfo.LastRunTime -ne [DateTime]::MinValue)) {
+            $lastRunTime = [int64]([DateTimeOffset]$taskInfo.LastRunTime.ToUniversalTime()).ToUnixTimeSeconds()
         }
-    }
-}, @{
-    Name = 'NextRunTimeTs'
-    Expression = {
-        # Check if NextRunTime exists and is a valid DateTime object
-        if ($_.NextRunTime -and ($_.NextRunTime -is [DateTime]) -and ($_.NextRunTime -ne [DateTime]::MinValue)) {
-            # Convert to DateTimeOffset, then calculate Unix seconds
-            [int64]([DateTimeOffset]$_.NextRunTime.ToUniversalTime()).ToUnixTimeSeconds()
-        } else {
-            $null # Or 0, or an empty string
+
+        # Convert NextRunTime
+        if ($taskInfo.NextRunTime -and ($taskInfo.NextRunTime -is [DateTime]) -and ($taskInfo.NextRunTime -ne [DateTime]::MinValue)) {
+            $nextRunTime = [int64]([DateTimeOffset]$taskInfo.NextRunTime.ToUniversalTime()).ToUnixTimeSeconds()
         }
+
+        $lastTaskResult = $taskInfo.LastTaskResult
+        $numberOfMissedRuns = $taskInfo.NumberOfMissedRuns
+        $psComputerName = $taskInfo.PSComputerName
     }
-}, LastTaskResult, NumberOfMissedRuns, TaskName, PSComputerName
 
-$processedTasks = Get-ScheduledTask
-
+    # Construct the custom object for JSON output
+    [PSCustomObject]@{
+        TaskName = $task.TaskName
+        State = $task.State.ToString() # Get State from the base task object and convert enum to string
+        LastRunTime = $lastRunTime
+        NextRunTime = $nextRunTime
+        LastTaskResult = $lastTaskResult
+        NumberOfMissedRuns = $numberOfMissedRuns
+        PSComputerName = $psComputerName
+    }
+}
 
 # Create JSON
-$out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
+$out = $allTasksData | ConvertTo-Json -Compress -Depth 5
 
 # Write JSON
 Write-Host $out
