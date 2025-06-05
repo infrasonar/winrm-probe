@@ -14,6 +14,7 @@ SCHEDULED_TASKS_PS1 = ps_script('scheduled_tasks.ps1')
 # "NumberOfMissedRuns"  # int?
 # "PSComputerName"  # str?
 
+
 async def check_scheduled_tasks(
         asset: Asset,
         asset_config: dict,
