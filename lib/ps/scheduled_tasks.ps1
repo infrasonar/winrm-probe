@@ -29,7 +29,7 @@ $processedTasks = $tasks | Select-Object -Property @{
             $null # Or 0, or an empty string
         }
     }
-}, TaskName, LastTaskResult, NumberOfMissedRuns, PSComputerName
+}, LastRunTime
 
 # Create JSON
 $out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
