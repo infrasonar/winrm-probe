@@ -139,9 +139,9 @@ class Session:
                 b = self._clean_error_msg(rs.std_err)
                 msg = self._truncate(self._decode(b), 60)
                 assert msg  # only raise when we have a message
-                raise Exception(msg)
             except Exception:
                 raise Exception(f'status code: {rs.status_code} (no message)')
+            raise Exception(msg)
 
         try:
             data = json.loads(rs.std_out)
