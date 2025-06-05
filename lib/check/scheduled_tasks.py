@@ -11,6 +11,7 @@ SCHEDULED_TASKS_PS1 = ps_script('scheduled_tasks.ps1')
 # "LastRunTime"  # int?
 # "NextRunTime"  # int?
 # "LastTaskResult"  # int?
+# "LastTaskResultStr"  # str?
 # "NumberOfMissedRuns"  # int?
 # "PSComputerName"  # str?
 
