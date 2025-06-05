@@ -137,7 +137,7 @@ class Session:
             # readable
             try:
                 b = self._clean_error_msg(rs.std_err)
-                msg = self._decode(b)
+                msg = self._truncate(self._decode(b), 60)
                 assert msg  # only raise when we have a message
                 raise Exception(msg)
             except Exception:
@@ -146,7 +146,7 @@ class Session:
         try:
             data = json.loads(rs.std_out)
         except Exception:
-            msg = self._truncate(self._decode(rs.std_out), 20)
+            msg = self._truncate(self._decode(rs.std_out), 30)
             raise Exception(f'failed to parse content as JSON: {msg}')
 
         return data
@@ -192,4 +192,3 @@ class Session:
             sess = cls.sessions[key] = cls(username, password, host, port)
 
         return sess
-
