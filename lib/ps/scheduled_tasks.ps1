@@ -8,7 +8,7 @@ $unixEpochTicksInSeconds = $unixEpochTicks / 10000000
 # Process the tasks and convert dates to Unix timestamps
 # Note we divide by 10.000.000 as there are 10,000,000 nanosecond ticks in one second
 $processedTasks = $tasks | Select-Object -Property @{
-    Name = 'LastRunTime'
+    Name = 'LastRunTimeTs'
     Expression = {
         # Check if LastRunTime exists and is a valid DateTime object
         if ($_.LastRunTime -and ($_.LastRunTime -is [DateTime]) -and ($_.LastRunTime -ne [DateTime]::MinValue)) {
@@ -19,7 +19,7 @@ $processedTasks = $tasks | Select-Object -Property @{
         }
     }
 }, @{
-    Name = 'NextRunTime'
+    Name = 'NextRunTimeTs'
     Expression = {
         # Check if NextRunTime exists and is a valid DateTime object
         if ($_.NextRunTime -and ($_.NextRunTime -is [DateTime]) -and ($_.NextRunTime -ne [DateTime]::MinValue)) {
