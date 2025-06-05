@@ -39,4 +39,6 @@ async def check_software(
     sess = await get_session(asset, asset_config, config)
     res = await sess.query(SOFTWARE_PS1)
 
-    return res
+    return {
+        'installed_software': res
+    }
