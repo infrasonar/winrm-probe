@@ -11,7 +11,7 @@ $allTasksData = Get-ScheduledTask | ForEach-Object {
     $nextRunTime = $null
     $lastTaskResult = $null
     $numberOfMissedRuns = $null
-    $psComputerName = $task.PSComputerName # PSComputerName is usually available on the base task object
+    $psComputerName = $task.PSComputerName  # PSComputerName is usually available on the base task object
 
     # Populate values from $taskInfo if it was successfully retrieved
     if ($taskInfo) {
@@ -27,12 +27,13 @@ $allTasksData = Get-ScheduledTask | ForEach-Object {
 
         $lastTaskResult = $taskInfo.LastTaskResult
         $numberOfMissedRuns = $taskInfo.NumberOfMissedRuns
-        $psComputerName = $taskInfo.PSComputerName
+        $psComputerName = $taskInfo.PSComputerName  # Execution of the task (with -ComputerName RemotePC as example)
     }
 
     # Construct the custom object for JSON output
     [PSCustomObject]@{
         TaskName = $task.TaskName
+        TaskPath = $task.Path  # Unique
         State = $task.State.ToString() # Get State from the base task object and convert enum to string
         LastRunTime = $lastRunTime
         NextRunTime = $nextRunTime
