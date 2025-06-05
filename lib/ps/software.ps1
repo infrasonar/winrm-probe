@@ -36,6 +36,7 @@ foreach ($path in $registryPaths) {
     } | Select-Object -Property DisplayVersion, InstallDate, Publisher, EstimatedSize, VersionMajor, VersionMinor, DisplayName, PSChildName
 }
 
+# Create JSON
 $out = $arr | ConvertTo-Json -Compress
 
 # Write JSON
