@@ -5,8 +5,8 @@ from ..utils import ps_script, get_session
 
 SCHEDULED_TASKS_PS1 = ps_script('scheduled_tasks.ps1')
 
+# "name"  # str
 # "TaskName"  # str
-# "TaskPath"  # str (->name)
 # "State": # str
 # "LastRunTime"  # int?
 # "NextRunTime"  # int?
