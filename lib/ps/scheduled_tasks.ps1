@@ -8,7 +8,7 @@ $unixEpoch = [DateTimeOffset](Get-Date -Year 1970 -Month 1 -Day 1 -Hour 0 -Minut
 # Process the tasks and convert dates to Unix timestamps
 # Note we divide by 10.000.000 as there are 10,000,000 nanosecond ticks in one second
 $processedTasks = $tasks | Select-Object -Property @{
-    Name = 'LastRunTimestampMs'
+    Name = 'LastRunTimestamp'
     Expression = {
         # Check if LastRunTime exists and is a valid DateTime object
         if ($_.LastRunTime -and ($_.LastRunTime -is [DateTime]) -and ($_.LastRunTime -ne [DateTime]::MinValue)) {
@@ -29,7 +29,7 @@ $processedTasks = $tasks | Select-Object -Property @{
             $null # Or 0, or an empty string
         }
     }
-}
+}, TaskName, LastTaskResult, NumberOfMissedRuns, PSComputerName
 
 # Create JSON
 $out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
