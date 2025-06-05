@@ -30,7 +30,12 @@ $processedTasks = $tasks | Select-Object -Property @{
             $null # Or 0, or an empty string
         }
     }
-}, LastRunTime
+}, @{
+    Name = 'Type'
+    Expression = {
+        $_.NextRunTime.GetType().Name
+    }
+} LastRunTime
 
 # Create JSON
 $out = $processedTasks | ConvertTo-Json -Compress -Depth 5  # -Depth just in case
