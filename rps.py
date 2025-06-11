@@ -23,8 +23,8 @@ if __name__ == '__main__':
         help='Powershell script to execute')
 
     parser.add_argument(
-        '-h',
-        '--host',
+        '-a',
+        '--address',
         type=str,
         required=True,
         help='host name or address of remote host')
