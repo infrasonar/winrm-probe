@@ -60,5 +60,5 @@ if __name__ == '__main__':
         ps_script,
         args.username,
         args.password,
-        args.host,
+        args.address,
         args.port))
