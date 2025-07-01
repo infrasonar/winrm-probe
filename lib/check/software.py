@@ -6,7 +6,7 @@ SOFTWARE_PS1 = ps_script('software.ps1')
 
 # "DisplayVersion" # str
 # "InstallDate" # str?
-# "Publisher": # str
+# "Publisher": # str?
 # "EstimatedSize": # int? (in KB -> *1024)
 # "VersionMajor": # int?
 # "VersionMinor": # int?
