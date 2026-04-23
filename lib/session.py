@@ -1,6 +1,6 @@
 from __future__ import annotations
 from base64 import b64encode
-from typing import Optional, Any
+from typing import Any
 from winrm import Response
 from winrm.protocol import Protocol
 import asyncio
@@ -14,8 +14,8 @@ import xml.etree.ElementTree as ET
 
 class Session:
     sessions: dict[tuple[str, str, str, int], Session] = dict()
-    loop: Optional[asyncio.AbstractEventLoop] = None
-    task: Optional[asyncio.Future] = None
+    loop: asyncio.AbstractEventLoop | None = None
+    task: asyncio.Future | None = None
     max_idle: float = 60.0
 
     def __init__(self, username: str, password: str,
@@ -27,8 +27,8 @@ class Session:
         self.port = port
         self.last_access = time.time()
 
-        self.protocol: Optional[Protocol] = None
-        self.shell_id: Optional[str] = None
+        self.protocol: Protocol | None = None
+        self.shell_id: str | None = None
         if self.loop is None:
             self.__class__.loop = asyncio.get_running_loop()
             self.__class__.task = asyncio.ensure_future(self.close_sessions())

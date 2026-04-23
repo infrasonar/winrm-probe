@@ -1,4 +1,5 @@
 from libprobe.asset import Asset
+from libprobe.check import Check
 from ..utils import ps_script, get_session
 
 
@@ -14,19 +15,22 @@ SOFTWARE_PS1 = ps_script('software.ps1')
 # "PSChildName": # -> name
 
 
-async def check_software(
-        asset: Asset,
-        asset_config: dict,
-        config: dict) -> dict:
-    sess = await get_session(asset, asset_config, config)
-    items = await sess.query(SOFTWARE_PS1)
+class CheckSoftware(Check):
+    key = 'software'
+    unchanged_eol = 14400
 
-    for item in items:
-        item['name'] = item.pop('PSChildName')
+    @staticmethod
+    async def run(asset: Asset, local_config: dict, config: dict) -> dict:
 
-        if item['EstimatedSize']:
-            item['EstimatedSize'] *= 1024
+        sess = await get_session(asset, local_config, config)
+        items = await sess.query(SOFTWARE_PS1)
 
-    return {
-        'installed': items
-    }
+        for item in items:
+            item['name'] = item.pop('PSChildName')
+
+            if item['EstimatedSize']:
+                item['EstimatedSize'] *= 1024
+
+        return {
+            'installed': items
+        }
