@@ -1,5 +1,6 @@
 from collections import defaultdict
 from libprobe.asset import Asset
+from libprobe.check import Check
 from ..utils import ps_script, get_session
 
 
@@ -45,33 +46,36 @@ def result_to_string(i: int, loopkup: dict[int, str] = {
     return loopkup.get(i, f"Unknown Result ({hex(i)})")
 
 
-async def check_scheduled_tasks(
-        asset: Asset,
-        asset_config: dict,
-        config: dict) -> dict:
-    sess = await get_session(asset, asset_config, config)
-    items = await sess.query(SCHEDULED_TASKS_PS1)
+class CheckScheduledTasks(Check):
+    key = 'scheduledTasks'
+    unchanged_eol = 14400
 
-    counter = defaultdict(int)
-    for item in items:
-        name = item['TaskName']
-        rc = item['LastTaskResult']
-        counter[name] += 1
-        item['name'] = f'{name}{counter[name]}'
-        if rc is None:
-            item.pop('LastTaskResult')
-        else:
-            item['LastTaskResultStr'] = result_to_string(rc)
-            if rc == 267011:
-                # Task Not Yet Run, we might have a last run time, but this
-                # value means nothing
-                item['LastRunTime'] = None
+    @staticmethod
+    async def run(asset: Asset, local_config: dict, config: dict) -> dict:
 
-        # remove properties which are null often to reduce size
-        for key in ('LastRunTime', 'NextRunTime', 'PSComputerName'):
-            if item[key] is None:
-                item.pop(key)
+        sess = await get_session(asset, local_config, config)
+        items = await sess.query(SCHEDULED_TASKS_PS1)
 
-    return {
-        'scheduledTasks': items
-    }
+        counter = defaultdict(int)
+        for item in items:
+            name = item['TaskName']
+            rc = item['LastTaskResult']
+            counter[name] += 1
+            item['name'] = f'{name}{counter[name]}'
+            if rc is None:
+                item.pop('LastTaskResult')
+            else:
+                item['LastTaskResultStr'] = result_to_string(rc)
+                if rc == 267011:
+                    # Task Not Yet Run, we might have a last run time, but this
+                    # value means nothing
+                    item['LastRunTime'] = None
+
+            # remove properties which are null often to reduce size
+            for key in ('LastRunTime', 'NextRunTime', 'PSComputerName'):
+                if item[key] is None:
+                    item.pop(key)
+
+        return {
+            'scheduledTasks': items
+        }

@@ -1,3 +1,2 @@
 pywinrm==0.5.0
-libprobe==0.3.3
-
+libprobe==2.0.6

@@ -14,7 +14,7 @@ def ps_script(fn: str) -> str:
 
 async def get_session(
         asset: Asset,
-        asset_config: dict,
+        local_config: dict,
         config: dict) -> Session:
     address = config.get('address')
     if not address:
@@ -25,11 +25,11 @@ async def get_session(
         raise CheckException(
             'port should be either 5985 (http) or 5986 (https)')
 
-    username = asset_config.get('username')
+    username = local_config.get('username')
     if not username:
         raise CheckException(
             'missing `username` in appliance asset configuration')
-    password = asset_config.get('password')
+    password = local_config.get('password')
     if not password:
         raise CheckException(
             'missing `password` in appliance asset configuration')
